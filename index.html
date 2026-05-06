@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NVJ Wedding Planner — Professional Wedding Guest List & Table Designer</title>
+<meta name="description" content="A professional wedding guest list tracker and interactive table designer for Google Sheets. Manage guests, RSVPs, meal choices, and seating arrangements effortlessly.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold:     #9A7B2F;
+    --gold-mid: #C9A84C;
+    --gold-lt:  #F5EFD7;
+    --gold-xl:  #FDFAF0;
+    --dark:     #1C1C1C;
+    --gray:     #6B6B6B;
+    --white:    #FFFFFF;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--white);
+    color: var(--dark);
+    overflow-x: hidden;
+  }
+
+  /* ── HERO ─────────────────────────────────────────────────── */
+  .hero {
+    min-height: 100vh;
+    background: var(--dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(154,123,47,0.18) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 40% at 80% 100%, rgba(201,168,76,0.10) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .hero-ornament {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    letter-spacing: 0.3em;
+    color: var(--gold-mid);
+    text-transform: uppercase;
+    margin-bottom: 28px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.2s;
+  }
+
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(42px, 8vw, 86px);
+    font-weight: 300;
+    color: var(--white);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    margin-bottom: 12px;
+    opacity: 0;
+    animation: fadeUp 0.9s ease forwards 0.35s;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold-mid);
+  }
+
+  .hero-sub {
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 40px;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 0.5s;
+  }
+
+  .hero-desc {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(18px, 2.5vw, 24px);
+    font-weight: 300;
+    font-style: italic;
+    color: rgba(255,255,255,0.7);
+    max-width: 580px;
+    line-height: 1.7;
+    margin-bottom: 52px;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 0.65s;
+  }
+
+  .hero-divider {
+    width: 60px;
+    height: 1px;
+    background: var(--gold-mid);
+    margin: 0 auto 52px;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 0.6s;
+  }
+
+  .btn-primary {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--white);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 16px 40px;
+    border: 1px solid var(--gold);
+    transition: background 0.25s, color 0.25s, border-color 0.25s;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 0.8s;
+  }
+  .btn-primary:hover {
+    background: transparent;
+    color: var(--gold-mid);
+    border-color: var(--gold-mid);
+  }
+
+  /* ── FEATURES ─────────────────────────────────────────────── */
+  .features {
+    padding: 100px 24px;
+    background: var(--gold-xl);
+    text-align: center;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 300;
+    color: var(--dark);
+    margin-bottom: 60px;
+    line-height: 1.2;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 32px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .feature-card {
+    background: var(--white);
+    padding: 40px 32px;
+    border: 1px solid rgba(154,123,47,0.15);
+    text-align: left;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .feature-card:hover {
+    border-color: var(--gold-mid);
+    box-shadow: 0 8px 32px rgba(154,123,47,0.08);
+  }
+
+  .feature-icon {
+    font-size: 28px;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .feature-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 10px;
+  }
+
+  .feature-desc {
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--gray);
+    line-height: 1.7;
+  }
+
+  /* ── HOW IT WORKS ─────────────────────────────────────────── */
+  .how {
+    padding: 100px 24px;
+    background: var(--white);
+    text-align: center;
+  }
+
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    max-width: 720px;
+    margin: 0 auto;
+    text-align: left;
+  }
+
+  .step {
+    display: flex;
+    gap: 28px;
+    padding: 32px 0;
+    border-bottom: 1px solid rgba(154,123,47,0.12);
+    align-items: flex-start;
+  }
+  .step:last-child { border-bottom: none; }
+
+  .step-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    font-weight: 300;
+    color: var(--gold-mid);
+    line-height: 1;
+    min-width: 48px;
+    opacity: 0.6;
+  }
+
+  .step-content h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 6px;
+  }
+
+  .step-content p {
+    font-size: 13px;
+    color: var(--gray);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  /* ── FOOTER ───────────────────────────────────────────────── */
+  footer {
+    background: var(--dark);
+    padding: 48px 24px;
+    text-align: center;
+  }
+
+  .footer-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 300;
+    color: var(--white);
+    letter-spacing: 0.05em;
+    margin-bottom: 20px;
+  }
+
+  .footer-logo span { color: var(--gold-mid); }
+
+  .footer-links {
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+
+  .footer-links a {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--gold-mid); }
+
+  .footer-copy {
+    font-size: 11px;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 0.05em;
+  }
+
+  /* ── ANIMATIONS ───────────────────────────────────────────── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 600px) {
+    .step { flex-direction: column; gap: 12px; }
+    .step-num { font-size: 36px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <p class="hero-ornament">✦ NVJ Wedding Planner ✦</p>
+  <h1 class="hero-title">Plan Every Detail.<br><em>Effortlessly.</em></h1>
+  <p class="hero-sub">Professional Wedding Tools for Google Sheets</p>
+  <div class="hero-divider"></div>
+  <p class="hero-desc">A complete wedding guest list tracker and interactive table designer — built inside Google Sheets so everything stays in one place.</p>
+  <a href="mailto:nvj.support@gmail.com" class="btn-primary">Get in Touch</a>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <p class="section-label">What's Included</p>
+  <h2 class="section-title">Everything you need,<br>nothing you don't.</h2>
+  <div class="features-grid">
+    <div class="feature-card">
+      <span class="feature-icon">👥</span>
+      <h3 class="feature-title">Guest List Tracker</h3>
+      <p class="feature-desc">Track up to 1,000 guests with RSVP status, meal choices, dietary notes, gift tracking, and thank you status — all with automatic color-coded dropdowns.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🪑</span>
+      <h3 class="feature-title">Table Designer</h3>
+      <p class="feature-desc">An interactive visual seating chart builder with drag-and-drop tables, six table shapes, resizable chairs, and instant guest assignment.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">📊</span>
+      <h3 class="feature-title">Live Dashboard</h3>
+      <p class="feature-desc">Real-time summary of attendance, meal choices, and guest breakdown by side — perfect for sharing with your planner or caterer.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🔄</span>
+      <h3 class="feature-title">Auto-Sync</h3>
+      <p class="feature-desc">Changes in the Table Designer automatically update the Guest List, Seating Chart, and Table Summary tabs. Everything stays in sync.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">📋</span>
+      <h3 class="feature-title">Table Summary</h3>
+      <p class="feature-desc">A clean overview of every table — seats available, guests seated, and capacity at a glance. Auto-generated every time you save.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🔒</span>
+      <h3 class="feature-title">Protected & Secure</h3>
+      <p class="feature-desc">Headers and formula cells are automatically protected to prevent accidental edits. Your data stays safe and formatted correctly.</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how">
+  <p class="section-label">How It Works</p>
+  <h2 class="section-title">Up and running<br>in minutes.</h2>
+  <div class="steps">
+    <div class="step">
+      <span class="step-num">01</span>
+      <div class="step-content">
+        <h3>Receive your sheet</h3>
+        <p>You'll receive a link to make your own copy of the NVJ Wedding Planner Google Sheet. No installation required — it works directly in Google Sheets.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-num">02</span>
+      <div class="step-content">
+        <h3>Add your guests</h3>
+        <p>Fill in your guest list with names, sides, RSVP status, meal choices, and contact information. Dropdowns and color coding apply automatically.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-num">03</span>
+      <div class="step-content">
+        <h3>Design your seating</h3>
+        <p>Open the Table Designer from the menu. Arrange tables visually, assign guests to seats, and customize table shapes, sizes, and names.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-num">04</span>
+      <div class="step-content">
+        <h3>Save & everything updates</h3>
+        <p>Click Save & Close and your Seating Chart, Table Summary, and Guest List all update automatically. Share with your planner, venue, or caterer instantly.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p class="footer-logo"><span>✦</span> NVJ Wedding Planner <span>✦</span></p>
+  <nav class="footer-links">
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="mailto:nvj.support@gmail.com">Contact</a>
+  </nav>
+  <p class="footer-copy">© 2026 NVJ Wedding Planner. All rights reserved.</p>
+</footer>
+
+</body>
+</html>
